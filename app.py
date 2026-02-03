@@ -36,18 +36,19 @@ brand_list.extend(df['brand'].unique().tolist())
 df_scatter = df[df['brand'].isin(brand_list)]
 df_scatter_2 = df_scatter.groupby(['brand', 'condition']).agg(
     {'odometer': 'mean', 'price': 'mean'}).reset_index()
-# fig_scatter = px.scatter(df_scatter_2, x="odometer", y="price", color="brand")#
-#                 #size='petal_length', hover_data=['petal_width'])
-# fig_scatter.show()
+
 
 marca_seleccionada = st.multiselect(
-    "Selecciona una marca:", brand_list)
-if marca_seleccionada != 'todas':
-    df_filtered = df_scatter_2[df_scatter_2['brand'].isin(marca_seleccionada)]
-    fig_filtered = px.scatter(df_filtered, x="odometer", y="price", color="condition",
-                              title=f"Precio vs Odómetro para {marca_seleccionada}")
-    st.plotly_chart(fig_filtered, use_container_width=True)
+    "Selecciona una marca:", brand_list, default=['todas'])
+
+if 'todas' in marca_seleccionada:
+    df_filtered = df_scatter_2
+    titulo = "Precio vs Odómetro para todas las marcas"
 else:
-    fig_filtered = px.scatter(df_scatter_2, x="odometer", y="price", color="condition",
-                              title=f"Precio vs Odómetro para {marca_seleccionada}")
-    st.plotly_chart(fig_filtered, use_container_width=True)
+
+    df_filtered = df_scatter_2[df_scatter_2['brand'].isin(marca_seleccionada)]
+    titulo = f"Precio vs Odómetro para: {', '.join(marca_seleccionada)}"
+
+fig_filtered = px.scatter(df_filtered, x="odometer",
+                          y="price", color="condition", title=titulo)
+st.plotly_chart(fig_filtered, use_container_width=True)
